@@ -97,3 +97,32 @@ This approach is OK when the specific,standardized dummy values (e.g., AKIAIOSFO
 
 2. **Path exclusion** — `paths: [docs/]` in `.gitleaks.toml`. When is this risky?
 Excluding an entire directory is highly risky because it creates a massive blind spot for the security scanner. If a developer accidentally saves a .env file, an error log, or actual configuration containing real production secrets into the docs/ folder, the scanner will silently ignore it, leading to a critical leak.
+
+
+## Bonus: History Rewrite
+
+### Before
+```
+3000deb (HEAD -> main) docs: add usage notes
+ecb830e feat: empty log
+ee634b2 feat: add config
+b1ac2cd init
+```
+Output of `git log -p | grep -c 'ghp_'`: **2**
+
+### After
+```
+451e894 (HEAD -> main) docs: add usage notes
+74dc0f8 feat: empty log
+4d2a994 feat: add config
+beccefa init
+```
+Output of `git log -p | grep -c 'ghp_'`: **0**
+Output of `git log -p | grep -c 'REDACTED'`: **2**
+
+### The two-step pattern in real life
+1. `git filter-repo --replace-text replacements.txt` — rewrite locally.
+2. **Secret Rotation (Revocation)** — This is the mandatory second step. Cleaning the history only removes the secret from the repository. However, since the secret was already pushed to a remote server, it is compromised. You must go to the service provider (e.g., GitHub, AWS), revoke the old compromised key, and generate a new one.
+
+### Error without --forced
+The tool has a built-in safety mechanism and refuses to destructively overwrite history if the repository is not a "fresh clone" (e.g., if there are reflog entries from recent work). I had to explicitly add the `--force` flag to bypass this protection and proceed with the rewrite.
