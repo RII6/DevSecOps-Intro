@@ -90,7 +90,7 @@ Digest binding guarantees that we are signing the exact immutable bits of an ima
 - buildType in predicate: `https://example.com/lab8/local-build`
 
 ### What this gives a Lab 9 verifier (2-3 sentences)
-Having both signatures and attestations позволяет Kubernetes admission controller (например, Kyverno) проверять не только то, кем был собран образ, но и его содержимое (SBOM). Когда появляется новая уязвимость (Log4Shell), аттестованный образ гарантирует, что встроенный SBOM является подлинным и не был подменен. Это позволяет службам безопасности моментально опрашивать запущенные приложения на наличие уязвимых компонентов, не доверяя слепо непроверенным спецификациям от сторонних поставщиков.
+Having both signatures and attestations allows a Kubernetes admission controller (such as Kyverno) to verify not only who built the image, but also its contents (SBOM). When a new vulnerability (like Log4Shell) emerges, an attested image guarantees that the embedded SBOM is genuine and has not been tampered with. This enables security teams to instantly query running applications for vulnerable components without blindly trusting unverified specifications from third-party vendors.
 
 ---
 
@@ -112,4 +112,4 @@ error during command execution: failed to verify signature: could not verify mes
 ```
 
 ### Codecov 2021 mitigation (2-3 sentences)
-Компрометация Codecov произошла потому, что клиенты скачивали bash-скрипт и напрямую выполняли его (`curl | bash`) без какой-либо криптографической проверки целостности. Если бы CI-пайплайны требовали скачивания самого скрипта и его бандла с подписью, а затем перед выполнением запускали `cosign verify-blob`, то подмененный хакерами скрипт мгновенно не прошел бы проверку (invalid signature), что полностью предотвратило бы атаку на цепочку поставок сотен компаний.
+The Codecov compromise occurred because clients were downloading a bash script and executing it directly (`curl | bash`) without any cryptographic integrity checks. If CI pipelines had required downloading both the script and its signature bundle, and then ran `cosign verify-blob` before execution, the hacker-modified script would have instantly failed verification (invalid signature). This would have completely prevented the supply chain attack from impacting hundreds of companies.
